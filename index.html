@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="Pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="favicon.png">
+    <link href='https://unpkg.com/boxicons@2.1.2/css/boxicons.min.css' rel='stylesheet'>
+    <link rel="stylesheet" href="style.css">
+    <title>GeoLead</title>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.0/css/bulma.min.css">
+    <script defer src="https://use.fontawesome.com/releases/v5.3.1/js/all.js"></script>
+    <script>
+      window.onload = function() {
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(showPosition);
+        } else {
+          document.getElementById("location").innerHTML = "Geolocation não é suportado por este navegador.";
+        }
+      };
+
+      function sendData() {
+        const keywords = document.getElementById("keywords").value;
+        const radius = document.getElementById("radius").value;
+
+        fetch('http://34.125.170.209:80/results', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({keywords: keywords, radius: radius, clientLocation: clientLocation})
+        })
+        .then(response => response.json())
+        .then(data => {
+          const json = JSON.parse(data.result)
+          console.log(json)
+          createTable(json)
+        })
+        .catch(error => console.error(error));
+      }
+
+      let clientLocation;
+
+      function showPosition(position) {
+        clientLocation = {
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude
+        };
+        console.log(clientLocation);
+      }
+
+
+
+    </script>
+</head>
+<body>
+    <header>
+        <nav class="navigation">
+            <a href="#" class="logo">Geo<span>Lead</span></a>
+            <ul class="nav-menu">
+                <li class="nav-item"><a href="#home">Home</a></li>
+                <li class="nav-item"><a href="#section2">Captação de Leads</a></li>
+                <li class="nav-item"><a href="#section3">Resultado</a></li>
+                <i class='bx bx-search'></i>
+            </ul>
+            <div class="menu">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </div>
+        </nav>
+    </header>
+    <main>
+        <section class="home" id="home">
+            <div class="home-text">
+                <h4 class="text-h4">Bem-vindo ao GeoLead</h4>
+                <h1 class="text-h1">Busque seus clientes agora!</h1>
+                <p>Em 3 pequenos passos podemos te entregar suas futuras parcerias de negócios, venha conosco agora!</p>
+                <a href="#section2" class="home-btn">Rastrear</a>
+                <script>
+                    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                        anchor.addEventListener('click', function (e) {
+                            e.preventDefault();
+                            document.querySelector(this.getAttribute('href')).scrollIntoView({
+                                behavior: 'smooth'
+                            });
+                        });
+                    });
+                </script>
+
+            </div>
+            <div class="home-img">
+                <img src="geo.png" alt="hamburguer">
+            </div>
+        </section>
+
+        <section id="section2" class="form">
+            <div class="column is-6-tablet is-7-desktop is-7-widescreen">
+                <form method="post" class="box relative">
+                    <h1 class="has-text-centered mb-5 is-size-3">Captação de Leads</h1>
+
+                    <div class="field">
+                    <label class="label">Insira os segmentos desejados separados por espaços</label>
+                    <div class="control" >
+                        <input class="input " type="text" name="keywords" id="keywords"/>
+                    </div>
+                    </div>
+
+                    <div class="field">
+                    <label class="label">Insira o raio desejado</label>
+                    <div class="control" >
+                        <input class="input relative" type="text" name="radius" id="radius"/>
+                    </div>
+                    </div>
+
+                    <div class="enviar">
+                        <a class="button is-success" type="button" href="#section3" onclick="sendData()">Buscar!</a>
+                    </div>
+
+                    <script>
+                        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                            anchor.addEventListener('click', function (e) {
+                                e.preventDefault();
+                                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                                    behavior: 'smooth'
+                                });
+                            });
+                        });
+                    </script>
+                </form>
+            </div>
+
+            <script>
+            
+                function createTable(data) {
+                  var tableContainer = document.getElementById("table-container");
+                  var table = document.createElement("table");
+                  var thead = document.createElement("thead");
+                  var tbody = document.createElement("tbody");
+                  
+                  // Criar cabeçalho da tabela
+                  var headerRow = document.createElement("tr");
+                  for (var header in data[0]) {
+                    var headerCell = document.createElement("th");
+                    headerCell.textContent = header;
+                    headerRow.appendChild(headerCell);
+                  }
+                  thead.appendChild(headerRow);
+                  table.appendChild(thead);
+            
+                  // Criar as linhas da tabela
+                  for (var i = 0; i < data.length; i++) {
+                    var row = document.createElement("tr");
+                    for (var key in data[i]) {
+                      var cell = document.createElement("td");
+                      cell.textContent = data[i][key];
+                      row.appendChild(cell);
+                    }
+                    tbody.appendChild(row);
+                  }
+                  table.appendChild(tbody);
+            
+                  tableContainer.appendChild(table);
+                }
+              </script>        
+
+        </section>
+        <section  id="section3" class="tables">
+
+          <div id="table-container" class="tableg"></div>
+
+        </section>
+    </main>
+    <script src="script.js"></script>
+</body>
+</html>
